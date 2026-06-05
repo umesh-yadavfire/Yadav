@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yadav Study Planner</title>
+<title>Yadav Study Hub</title>
 
 <style>
+
 *{
 margin:0;
 padding:0;
@@ -16,32 +17,56 @@ font-family:Arial,sans-serif;
 body{
 background:#0f172a;
 color:white;
-padding:20px;
+padding:15px;
+transition:0.4s;
 }
 
-.container{
-max-width:1200px;
-margin:auto;
-}
-
-.header{
+h1{
 text-align:center;
-margin-bottom:20px;
+margin-bottom:15px;
 }
 
 .card{
-background:#1e293b;
-padding:20px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:15px;
 border-radius:15px;
 margin-bottom:15px;
+}
+
+h2{
+color:#38bdf8;
+margin-bottom:10px;
+}
+
+.timer{
+font-size:28px;
+font-weight:bold;
+margin:10px 0;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:10px;
+background:#38bdf8;
+font-weight:bold;
+cursor:pointer;
+}
+
+select{
+width:100%;
+padding:10px;
+border-radius:10px;
 }
 
 .progress{
 width:100%;
 height:20px;
 background:#334155;
-border-radius:10px;
+border-radius:20px;
 overflow:hidden;
+margin-top:10px;
 }
 
 .progress-bar{
@@ -50,132 +75,195 @@ width:0%;
 background:#22c55e;
 }
 
-.task{
-display:flex;
-justify-content:space-between;
-margin:10px 0;
-}
-
-button{
-padding:10px 15px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-}
-
-.complete{
-background:#22c55e;
-color:white;
-}
-
-.timer{
-font-size:40px;
+.countdown{
+font-size:25px;
+font-weight:bold;
 text-align:center;
-margin:15px;
 }
+
+.quote{
+font-style:italic;
+text-align:center;
+font-size:18px;
+}
+
+input[type=file]{
+width:100%;
+padding:10px;
+background:white;
+color:black;
+border-radius:10px;
+}
+
+label{
+display:block;
+margin-top:8px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<h1>📚 Yadav Study Hub</h1>
 
-<div class="header">
-<h1>📚 Yadav JEE Planner</h1>
-<h3>Daily Study Dashboard</h3>
+<div class="card">
+<h2>🎨 Theme</h2>
+
+<select id="theme" onchange="changeTheme()">
+<option value="dark">Dark Blue</option>
+<option value="light">Light</option>
+<option value="green">Nature Green</option>
+<option value="purple">Focus Purple</option>
+</select>
 </div>
 
 <div class="card">
-<h2>Today's Progress</h2>
-<br>
+<h2>🌟 Daily Motivation</h2>
+<div class="quote">
+"Consistency beats motivation."
+</div>
+</div>
+
+<div class="card">
+<h2>🎯 Daily Target (6 Hours)</h2>
+
+<p>Physics - 2 Hours</p>
+<p>Chemistry - 2 Hours</p>
+<p>Maths - 2 Hours</p>
+
 <div class="progress">
-<div class="progress-bar" id="bar"></div>
+<div class="progress-bar" id="progress"></div>
 </div>
-<br>
-<p id="percent">0%</p>
+
+<p id="progressText">0% Completed</p>
+
+</div>
+<div class="card">
+<h2>⏳ Physics Timer</h2>
+<div id="phy" class="timer">02:00:00</div>
+<button onclick="startTimer('phy',7200)">Start</button>
 </div>
 
 <div class="card">
-<h2>Today's Tasks</h2>
-
-<div class="task">
-<span>Maths - Matrices</span>
-<button class="complete" onclick="done()">Done</button>
+<h2>⚗ Chemistry Timer</h2>
+<div id="chem" class="timer">02:00:00</div>
+<button onclick="startTimer('chem',7200)">Start</button>
 </div>
 
-<div class="task">
-<span>Physics - Electrostatics</span>
-<button class="complete" onclick="done()">Done</button>
+<div class="card">
+<h2>📐 Maths Timer</h2>
+<div id="math" class="timer">02:00:00</div>
+<button onclick="startTimer('math',7200)">Start</button>
 </div>
 
-<div class="task">
-<span>Chemistry - Haloalkanes</span>
-<button class="complete" onclick="done()">Done</button>
+<div class="card">
+<h2>📂 Study Material</h2>
+<input type="file" multiple>
+<p>Upload PDFs, Notes, DPPs</p>
 </div>
+
+<div class="card">
+<h2>📝 Weekly Test Tracker</h2>
+
+<label><input type="checkbox"> Week 1 Test</label>
+<label><input type="checkbox"> Week 2 Test</label>
+<label><input type="checkbox"> Week 3 Test</label>
+<label><input type="checkbox"> Week 4 Test</label>
 
 </div>
 
 <div class="card">
-<h2>Pomodoro Timer</h2>
-
-<div class="timer" id="timer">
-25:00
-</div>
-
-<center>
-<button onclick="startTimer()">Start</button>
-</center>
-
-</div>
-
-<div class="card">
-<h2>JEE Target</h2>
-<p>Target Rank: AIR 5000</p>
-<p>Study Hours Today: 4 Hours</p>
-<p>Current Streak: 🔥 0 Days</p>
-</div>
-
+<h2>🚀 JEE Countdown</h2>
+<div class="countdown" id="countdown"></div>
 </div>
 
 <script>
 
-let completed=0;
+let completed = 0;
 
-function done(){
+function startTimer(id,time){
 
-completed++;
+let display=document.getElementById(id);
 
-let percent=(completed/3)*100;
+let timer=setInterval(function(){
 
-document.getElementById("bar").style.width=percent+"%";
+let h=Math.floor(time/3600);
+let m=Math.floor((time%3600)/60);
+let s=time%60;
 
-document.getElementById("percent").innerHTML=
-Math.min(percent,100)+"%";
-
-}
-
-let time=1500;
-
-function startTimer(){
-
-let interval=setInterval(()=>{
-
-let min=Math.floor(time/60);
-let sec=time%60;
-
-document.getElementById("timer").innerHTML=
-`${min}:${sec<10?'0':''}${sec}`;
+display.innerHTML=
+String(h).padStart(2,'0')+":"+
+String(m).padStart(2,'0')+":"+
+String(s).padStart(2,'0');
 
 time--;
 
 if(time<0){
-clearInterval(interval);
-alert("Session Complete!");
+
+clearInterval(timer);
+
+completed += 33.33;
+
+if(completed>100)
+completed=100;
+
+document.getElementById("progress").style.width=
+completed+"%";
+
+document.getElementById("progressText").innerHTML=
+Math.round(completed)+"% Completed";
+
+alert("Great Job! Session Completed.");
+
 }
 
 },1000);
 
 }
+
+function changeTheme(){
+
+let theme=document.getElementById("theme").value;
+
+if(theme=="dark"){
+document.body.style.background="#0f172a";
+document.body.style.color="white";
+}
+
+if(theme=="light"){
+document.body.style.background="#f8fafc";
+document.body.style.color="black";
+}
+
+if(theme=="green"){
+document.body.style.background="#0b3d2e";
+document.body.style.color="white";
+}
+
+if(theme=="purple"){
+document.body.style.background="#312e81";
+document.body.style.color="white";
+}
+
+}
+
+let examDate =
+new Date("January 20, 2027 00:00:00").getTime();
+
+setInterval(function(){
+
+let now = new Date().getTime();
+
+let distance = examDate - now;
+
+let days =
+Math.floor(distance/(1000*60*60*24));
+
+document.getElementById("countdown").innerHTML =
+days + " Days Left";
+
+},1000);
 
 </script>
 
